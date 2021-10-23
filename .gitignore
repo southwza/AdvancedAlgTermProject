@@ -1,0 +1,10 @@
+#Java
+*.class
+*.jar
+
+#Eclipse
+.settings/
+bin/
+tmp
+.project
+.classpath
