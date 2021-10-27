@@ -49,4 +49,26 @@ public class Graph {
         edges.add(e);
     }
 
+    @Override
+    public String toString() {
+        String nodesString = nodes.stream()
+                .map(node -> "  " + node.getIdentifier() + System.lineSeparator())
+                .collect(Collectors.joining());
+
+        String edgesString = edges.stream()
+                .map(edge -> "  " + edge.getNode1().getIdentifier() + ", " + edge.getNode2().getIdentifier() + ": " + edge.getWeight() + System.lineSeparator())
+                .collect(Collectors.joining());
+
+        String graphString = "Nodes: " + System.lineSeparator() + nodesString + System.lineSeparator() + "Edges: " + System.lineSeparator() + edgesString;
+        return graphString;
+    }
+
+    public Node findNode(String identifier) {
+        Node node = nodes.stream()
+                .filter(n -> n.getIdentifier().equals(identifier))
+                .findFirst().orElse(null);
+
+        return node;
+    }
+
 }
