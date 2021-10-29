@@ -3,7 +3,7 @@ package edu.utexas.ece382v.shortest_path.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
+public class Node implements Comparable<Node> {
 
     private String identifier;
     private Double weight;
@@ -36,6 +36,12 @@ public class Node {
 
     public void setEdges(List<Edge> edges) {
         this.edges = edges;
+    }
+
+    @Override
+    public int compareTo(Node o) {
+        //Not null safe
+        return weight.compareTo(o.getWeight());
     }
 
 }

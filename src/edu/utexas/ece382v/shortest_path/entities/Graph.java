@@ -31,21 +31,19 @@ public class Graph {
 
     public List<Edge> getOutgoingEdges(Node sourceNode) {
         return edges.stream() //
-                .filter(edge -> edge.getNode1().getIdentifier().equals(sourceNode.getIdentifier())
-                        || edge.getNode2().getIdentifier().equals(sourceNode.getIdentifier())) //
+                .filter(edge -> edge.getSourceNode().getIdentifier().equals(sourceNode.getIdentifier()))
                 .collect(Collectors.toList());
     }
 
     public Edge getSmallestOutgoingEdge(Node sourceNode) {
         Edge smallestOutgoingEdge = edges.stream() //
-                .filter(edge -> edge.getNode1().getIdentifier().equals(sourceNode.getIdentifier())
-                        || edge.getNode2().getIdentifier().equals(sourceNode.getIdentifier())) //
+                .filter(edge -> edge.getSourceNode().getIdentifier().equals(sourceNode.getIdentifier()))
                 .min(Comparator.comparing(Edge::getWeight)).orElse(null);
         return smallestOutgoingEdge;
     }
 
-    public void addEdge(Node node_1, Node node_2, double weight) {
-        Edge e = new Edge(node_1, node_2, weight);
+    public void addEdge(Node sourceNode, Node targetNode, double weight) {
+        Edge e = new Edge(sourceNode, targetNode, weight);
         edges.add(e);
     }
 
@@ -56,7 +54,7 @@ public class Graph {
                 .collect(Collectors.joining());
 
         String edgesString = edges.stream()
-                .map(edge -> "  " + edge.getNode1().getIdentifier() + ", " + edge.getNode2().getIdentifier() + ": " + edge.getWeight() + System.lineSeparator())
+                .map(edge -> "  " + edge.getSourceNode().getIdentifier() + ", " + edge.getTargetNode().getIdentifier() + ": " + edge.getWeight() + System.lineSeparator())
                 .collect(Collectors.joining());
 
         String graphString = "Nodes: " + System.lineSeparator() + nodesString + System.lineSeparator() + "Edges: " + System.lineSeparator() + edgesString;
