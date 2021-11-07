@@ -39,7 +39,7 @@ public class DijkstraShortestPath {
                 break;
             }
 
-            List<Edge> newEdges = g.getOutgoingEdges(fixedNode).stream() // Stream over outgoing edges
+            List<Edge> newEdges = fixedNode.getOutgoingEdges().stream() // Stream over outgoing edges
                     .filter(edge -> !fixedNodes.contains(edge.getTargetNode())) // Remove those already fixed
                     .collect(Collectors.toList());
 

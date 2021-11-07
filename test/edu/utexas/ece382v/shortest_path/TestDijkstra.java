@@ -50,6 +50,5 @@ public class TestDijkstra {
         assertEquals(32, DijkstraShortestPath.dijkstraShortestPath(g, node_1, node_3));
         assertEquals(39, DijkstraShortestPath.dijkstraShortestPath(g, node_1, node_4));
         assertEquals(77, DijkstraShortestPath.dijkstraShortestPath(g, node_1, node_5));
-
     }
 }

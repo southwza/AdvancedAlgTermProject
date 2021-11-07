@@ -1,19 +1,11 @@
 package edu.utexas.ece382v.shortest_path;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import edu.utexas.ece382v.shortest_path.entities.Edge;
 import edu.utexas.ece382v.shortest_path.entities.Graph;
@@ -30,90 +22,134 @@ public class DeltaSteppingShortestPath {
     private long sequentialTime = 0;
     private long parallelTime = 0;
 
-    private long fetime = 0;
 
-    public Double DeltaSteppingShortestPath(Graph g, Node source, Node target, Double delta) {
+    public Double calculateShortestPath(Graph g, Node source, Node target, double delta) {
+        return calculateShortestPath(g, source, target, delta, false, false);
+    }
+
+    /**
+     * 
+     * @param g The graph containing source and target nodes
+     * @param source
+     * @param target
+     * @param delta
+     * @param printStats Print execution information about parallelism
+     * @param singleThread Perform the delta stepping calculation sequentially
+     * @return
+     */
+    public Double calculateShortestPath(Graph g, Node source, Node target, Double delta, boolean printStats, boolean singleThread) {
+        sequentialTime = 0;
+        parallelTime = 0;
+
+        //Collect data on execution time
         start = System.nanoTime();
         this.delta = delta;
 
         //Initialize the weight of each node to a maximal value
         g.getNodes().stream().forEach(node -> node.setWeight(Double.MAX_VALUE));
 
-        Map<Node, Double> req; //Nodes to be relaxed to the given value
+        Map<Node, Edge> req; //Nodes to be relaxed to the given value
         Set<Node> S; //The set of nodes whose light edges have been relaxed but not the heavy edges
 
         B = new ConcurrentSkipListMap<>(); //List of buckets (Well, really a map, but the key is an integer representing an 'index')
 
         //Initialize our source node and first bucket
         relax(source, 0D);
+
+        //In our outer while loop, we'll process each bucket in our list of buckets
         while (B.size() > 0) {
             S = new HashSet<Node>();
             Set<Node> bucket = B.firstEntry().getValue();
+
+            //First, we'll relax all the 'light' edges in our bucket. These edges can connect
+            //to nodes which will also be added to this bucket, so we have a while loop to
+            //continue the process until all light edges have been processed. After this while
+            //loop executes, we can say that all nodes in the bucket have been fixed.
             while (bucket.size() > 0) {
                 //Let's gather all of the outgoing nodes along light edges.
-long fe = System.nanoTime();
-                req = bucket.stream().flatMap(node -> g.getOutgoingEdges(node).stream())
+                req = bucket.stream().flatMap(node -> node.getOutgoingEdges().stream())
                         .filter(e -> e.getWeight() <= delta) //filter out heavy edges
-                        .sorted(Comparator.comparing(e -> e.getSourceNode().getWeight() + e.getWeight()))
-                        .collect(Collectors.toMap(e -> e.getTargetNode(),
-                                e -> e.getSourceNode().getWeight() + e.getWeight(),
-                                (existing, replacement) -> existing));
-fetime += System.nanoTime() - fe;
+                        .collect(Collectors.toMap(
+                                e -> e.getTargetNode(),
+                                e -> e,
+                                (edge1, edge2) -> {
+                                    double edge1Relaxation = calculateRelaxation(edge1);
+                                    double edge2Relaxation = calculateRelaxation(edge2);
+                                    return edge2Relaxation < edge1Relaxation ? edge2 : edge1;
+                                }));
                 // Just a quick note about the stream expression above: we have the possibility
                 // that our bucket contains multiple relaxations to the same target node. This is
-                // handled by 1) sorting values by the relaxation amount and 2)using a
-                // 'mergeFunction' in the collector which just takes the first value, so if there
-                // is a conflict, we get the tightest relaxation for a given target node
+                // handled by the mergeFunction in the collector which takes the tightest
+                // relaxation for a given target node
                 S.addAll(bucket);
                 bucket.clear();
 
+                if (singleThread) {
+                    req.entrySet().stream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
+                } else {
+                    end = System.nanoTime();
+                    sequentialTime += end - start;
+                    //relax light nodes in parallel
+                    req.entrySet().parallelStream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
+                    start = System.nanoTime();
+                    parallelTime += start - end;
+                }
+            }
+
+            //If S contains our target node, then we can short-circuit and return it now
+            if (S.contains(target)) {
+                if (printStats) {
+                    printStats();
+                }
+
+                return target.getWeight();
+            }
+
+            //Now, let's relax all the heavy nodes from our bucket
+            req = S.stream().flatMap(node -> node.getOutgoingEdges().stream())
+                    .filter(e -> e.getWeight() > delta) //filter out light edges
+                    .collect(Collectors.toMap(
+                            e -> e.getTargetNode(),
+                            e -> e,
+                            (edge1, edge2) -> {
+                                double edge1Relaxation = calculateRelaxation(edge1);
+                                double edge2Relaxation = calculateRelaxation(edge2);
+                                return edge2Relaxation < edge1Relaxation ? edge2 : edge1;
+                            }));
+            //relax heavy nodes in parallel
+            if (singleThread) {
+                req.entrySet().stream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
+            } else {
                 end = System.nanoTime();
                 sequentialTime += end - start;
                 //relax light nodes in parallel
-                req.entrySet().parallelStream().forEach(entry -> relax(entry.getKey(), entry.getValue()));
-//                req.entrySet().stream().forEach(entry -> relax(entry.getKey(), entry.getValue()));
+                req.entrySet().parallelStream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
                 start = System.nanoTime();
                 parallelTime += start - end;
             }
-            //If S contains our target node, then we can short-circuit and return it now
-            if (S.contains(target)) {
-                end = System.nanoTime();
-                sequentialTime += end - start;
-
-                System.out.println("Sequential time: " + sequentialTime / 1000000);
-                System.out.println("Parallel time: " + parallelTime / 1000000);
-                System.out.println("p / p + s: " + ((parallelTime + 0.0) / (parallelTime + sequentialTime)));
-
-                System.out.println("filter exp time: " + (fetime)/1000000);
-                return target.getWeight();
-            }
-            //Now, let's relax all the heavy nodes from our bucket
-            req = S.stream().flatMap(node -> g.getOutgoingEdges(node).stream())
-                    .filter(e -> e.getWeight() > delta) //filter out heavy edges
-                    .sorted(Comparator.comparing(e -> e.getSourceNode().getWeight() + e.getWeight()))
-                    .collect(Collectors.toMap(e -> e.getTargetNode(),
-                            e -> e.getSourceNode().getWeight() + e.getWeight(),
-                            (existing, replacement) -> existing));
-
-            end = System.nanoTime();
-            sequentialTime += end - start;
-            //relax heavy nodes in parallel
-            req.entrySet().parallelStream().forEach(entry -> relax(entry.getKey(), entry.getValue()));
-//            req.entrySet().stream().forEach(entry -> relax(entry.getKey(), entry.getValue()));
-
-            start = System.nanoTime();
-            parallelTime += start - end;
 
             //Let's remove this bucket.
             B.pollFirstEntry();
         }
+        if (printStats) {
+            printStats();
+        }
+
+        return target.getWeight().equals(Double.MAX_VALUE) ? null : target.getWeight();
+    }
+
+    private void printStats() {
         end = System.nanoTime();
         sequentialTime += end - start;
 
-        System.out.println("Sequential time: " + sequentialTime);
-        System.out.println("Parallel time: " + parallelTime);
-        System.out.println("p / p + s: " + (parallelTime + 0.0 / (parallelTime + sequentialTime)));
-        return target.getWeight().equals(Double.MAX_VALUE) ? null : target.getWeight();
+        System.out.println("Sequential time: " + sequentialTime / 1000000);
+        System.out.println("Parallel time: " + parallelTime / 1000000);
+        System.out.println("p / p + s: " + ((parallelTime + 0.0) / (parallelTime + sequentialTime)));
+
+    }
+
+    private double calculateRelaxation(Edge edge) {
+        return edge.getSourceNode().getWeight() + edge.getWeight();
     }
 
     private void relax(Node node, double weight) {
@@ -126,7 +162,7 @@ fetime += System.nanoTime() - fe;
             }
             node.setWeight(weight);
             int bucketIndex = Double.valueOf(weight / delta).intValue();
-            if(!B.containsKey(bucketIndex)) {
+            if (!B.containsKey(bucketIndex)) {
                 B.putIfAbsent(bucketIndex, new ConcurrentSkipListSet<>());
             }
             B.get(bucketIndex).add(node);

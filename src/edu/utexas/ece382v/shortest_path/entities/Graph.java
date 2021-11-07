@@ -19,32 +19,30 @@ public class Graph {
     public List<Node> getNodes() {
         return nodes;
     }
+
     public void setNodes(List<Node> nodes) {
         this.nodes = nodes;
     }
-    public List<Edge> getEdges() {
-        return edges;
-    }
+
+//    public List<Edge> getEdges() {
+//        return edges;
+//    }
+
     public void setEdges(List<Edge> edges) {
         this.edges = edges;
-    }
-
-    public List<Edge> getOutgoingEdges(Node sourceNode) {
-        return edges.stream() //
-                .filter(edge -> edge.getSourceNode().getIdentifier().equals(sourceNode.getIdentifier()))
-                .collect(Collectors.toList());
-    }
-
-    public Edge getSmallestOutgoingEdge(Node sourceNode) {
-        Edge smallestOutgoingEdge = edges.stream() //
-                .filter(edge -> edge.getSourceNode().getIdentifier().equals(sourceNode.getIdentifier()))
-                .min(Comparator.comparing(Edge::getWeight)).orElse(null);
-        return smallestOutgoingEdge;
     }
 
     public void addEdge(Node sourceNode, Node targetNode, double weight) {
         Edge e = new Edge(sourceNode, targetNode, weight);
         edges.add(e);
+        sourceNode.getOutgoingEdges().add(e);
+        targetNode.getIncomingEdges().add(e);
+    }
+
+    public void addEdge(Edge edge) {
+        edges.add(edge);
+        edge.getSourceNode().getOutgoingEdges().add(edge);
+        edge.getTargetNode().getIncomingEdges().add(edge);
     }
 
     @Override
@@ -69,4 +67,7 @@ public class Graph {
         return node;
     }
 
+    public double averageEdgeWeight() {
+        return edges.stream().mapToDouble(edge -> edge.getWeight()).average().getAsDouble();
+    }
 }

@@ -13,30 +13,53 @@ import edu.utexas.ece382v.shortest_path.util.GraphGenerator;
 public class TestDeltaStepping {
     @Test
     void testDeltaStepping() throws Exception {
+        Long nodes = 1000000L;
         GraphGenerator graphGenerator = new GraphGenerator();
         long start = System.nanoTime();
-        Graph g = graphGenerator.generateGraph(5000L, 20, .8F, .1F);
+        Graph g = graphGenerator.generateGraph(nodes, 4, .8F, .4F);
         long end = System.nanoTime();
-        System.out.println("Time taken to generate a graph: " + (end - start) / 1000000 + "ms");
+        System.out.println("Time taken to generate a graph with " + nodes + " nodes with average edge weight of " + g.averageEdgeWeight() + ": " + (end - start) / 1000000 + "ms" + System.lineSeparator());
 //        System.out.println(g.toString());
-        //Calculate the shortest distance from node 0.0 to node 49.49
+
+        int oppositeIndex = (int)Math.sqrt(nodes) - 1;
+        String sourceNode = "0000.0000";
+        String targetNode = String.format("%04d", oppositeIndex) + "." + String.format("%04d", oppositeIndex);
 
         start = System.nanoTime();
-        Double shortestPathDist = DijkstraShortestPath.dijkstraShortestPath(g, g.findNode("0000.0000"), g.findNode("0049.0049"));
+        Double shortestPathDist = DijkstraShortestPath.dijkstraShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode));
         end = System.nanoTime();
-        System.out.println("Dijkstra shortest path: " + shortestPathDist + " calculated in " + (end - start)/1000000 + "ms");
+        System.out.println("Dijkstra shortest path from " + sourceNode + " to " + targetNode + ": " + shortestPathDist + " calculated in " + (end - start)/1000000 + "ms" + System.lineSeparator());
 
         DeltaSteppingShortestPath ds = new DeltaSteppingShortestPath();
-        Double delta = 40D;
+
+        Double delta = 30D;
         start = System.nanoTime();
-        Double deltaSteppingShortestPathDist = ds.DeltaSteppingShortestPath(g, g.findNode("0000.0000"), g.findNode("0049.0049"), delta);
+        Double deltaSteppingShortestPathDist = ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta, true, false);
         end = System.nanoTime();
-        System.out.println("Delta Stepping shortest path: " + deltaSteppingShortestPathDist + " calculated in " + (end - start)/1000000 + "ms");
+        System.out.println("Delta Stepping shortest path with delta of " + delta + ": " + deltaSteppingShortestPathDist + " calculated in " + (end - start)/1000000 + "ms" + System.lineSeparator());
+
+        delta = 40D;
+        start = System.nanoTime();
+        deltaSteppingShortestPathDist = ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta, true, false);
+        end = System.nanoTime();
+        System.out.println("Delta Stepping shortest path with delta of " + delta + ": " + deltaSteppingShortestPathDist + " calculated in " + (end - start)/1000000 + "ms" + System.lineSeparator());
+
+        delta = 50D;
+        start = System.nanoTime();
+        deltaSteppingShortestPathDist = ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta, true, false);
+        end = System.nanoTime();
+        System.out.println("Delta Stepping shortest path with delta of " + delta + ": " + deltaSteppingShortestPathDist + " calculated in " + (end - start)/1000000 + "ms" + System.lineSeparator());
+
+        delta = 60D;
+        start = System.nanoTime();
+        deltaSteppingShortestPathDist = ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta, true, false);
+        end = System.nanoTime();
+        System.out.println("Delta Stepping shortest path with delta of " + delta + ": " + deltaSteppingShortestPathDist + " calculated in " + (end - start)/1000000 + "ms" + System.lineSeparator());
 
         assertEquals(shortestPathDist, deltaSteppingShortestPathDist);
     }
 
-//    @Test
+    @Test
     void testDeltaStepping2() throws Exception {
 
         Graph g = new Graph();
@@ -62,9 +85,9 @@ public class TestDeltaStepping {
 
         DeltaSteppingShortestPath ds = new DeltaSteppingShortestPath();
 
-        assertEquals(22, ds.DeltaSteppingShortestPath(g, node_1, node_2, 2D));
-        assertEquals(32, ds.DeltaSteppingShortestPath(g, node_1, node_3, 2D));
-        assertEquals(39, ds.DeltaSteppingShortestPath(g, node_1, node_4, 2D));
-        assertEquals(77, ds.DeltaSteppingShortestPath(g, node_1, node_5, 2D));
+        assertEquals(22, ds.calculateShortestPath(g, node_1, node_2, 2D));
+        assertEquals(32, ds.calculateShortestPath(g, node_1, node_3, 2D));
+        assertEquals(39, ds.calculateShortestPath(g, node_1, node_4, 2D));
+        assertEquals(77, ds.calculateShortestPath(g, node_1, node_5, 2D));
     }
 }
