@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>AdvancedAlgTermProject</groupId>
+  <artifactId>AdvancedAlgTermProject</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <release>11</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <properties>
+  	<!-- Dependency versions -->
+  	<junit.jupiter.version>5.5.2</junit.jupiter.version>
+  	<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+  </properties>
+  <dependencies>
+     	<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+	    <dependency>
+		    <groupId>com.opencsv</groupId>
+		    <artifactId>opencsv</artifactId>
+		    <version>3.8</version>
+		</dependency>
+		<dependency>
+      		<groupId>org.junit.jupiter</groupId>
+	      	<artifactId>junit-jupiter-engine</artifactId>
+	      	<version>${junit.jupiter.version}</version>
+	      	<scope>test</scope>
+	    </dependency>
+    </dependencies>
+</project>
