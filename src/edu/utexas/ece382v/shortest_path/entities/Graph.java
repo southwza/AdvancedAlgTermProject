@@ -19,34 +19,30 @@ public class Graph {
     public List<Node> getNodes() {
         return nodes;
     }
+
     public void setNodes(List<Node> nodes) {
         this.nodes = nodes;
     }
-    public List<Edge> getEdges() {
-        return edges;
-    }
+
+//    public List<Edge> getEdges() {
+//        return edges;
+//    }
+
     public void setEdges(List<Edge> edges) {
         this.edges = edges;
     }
 
-    public List<Edge> getOutgoingEdges(Node sourceNode) {
-        return edges.stream() //
-                .filter(edge -> edge.getNode1().getIdentifier().equals(sourceNode.getIdentifier())
-                        || edge.getNode2().getIdentifier().equals(sourceNode.getIdentifier())) //
-                .collect(Collectors.toList());
-    }
-
-    public Edge getSmallestOutgoingEdge(Node sourceNode) {
-        Edge smallestOutgoingEdge = edges.stream() //
-                .filter(edge -> edge.getNode1().getIdentifier().equals(sourceNode.getIdentifier())
-                        || edge.getNode2().getIdentifier().equals(sourceNode.getIdentifier())) //
-                .min(Comparator.comparing(Edge::getWeight)).orElse(null);
-        return smallestOutgoingEdge;
-    }
-
-    public void addEdge(Node node_1, Node node_2, double weight) {
-        Edge e = new Edge(node_1, node_2, weight);
+    public void addEdge(Node sourceNode, Node targetNode, double weight) {
+        Edge e = new Edge(sourceNode, targetNode, weight);
         edges.add(e);
+        sourceNode.getOutgoingEdges().add(e);
+        targetNode.getIncomingEdges().add(e);
+    }
+
+    public void addEdge(Edge edge) {
+        edges.add(edge);
+        edge.getSourceNode().getOutgoingEdges().add(edge);
+        edge.getTargetNode().getIncomingEdges().add(edge);
     }
 
     @Override
@@ -56,7 +52,7 @@ public class Graph {
                 .collect(Collectors.joining());
 
         String edgesString = edges.stream()
-                .map(edge -> "  " + edge.getNode1().getIdentifier() + ", " + edge.getNode2().getIdentifier() + ": " + edge.getWeight() + System.lineSeparator())
+                .map(edge -> "  " + edge.getSourceNode().getIdentifier() + ", " + edge.getTargetNode().getIdentifier() + ": " + edge.getWeight() + System.lineSeparator())
                 .collect(Collectors.joining());
 
         String graphString = "Nodes: " + System.lineSeparator() + nodesString + System.lineSeparator() + "Edges: " + System.lineSeparator() + edgesString;
@@ -71,4 +67,7 @@ public class Graph {
         return node;
     }
 
+    public double averageEdgeWeight() {
+        return edges.stream().mapToDouble(edge -> edge.getWeight()).average().getAsDouble();
+    }
 }

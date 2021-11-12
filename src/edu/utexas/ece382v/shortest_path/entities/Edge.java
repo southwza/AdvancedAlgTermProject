@@ -2,30 +2,31 @@ package edu.utexas.ece382v.shortest_path.entities;
 
 public class Edge {
 
-    private Node node1;
-    private Node node2;
+    private Node sourceNode;
+    private Node targetNode;
     private Double weight;
 
-    public Edge(Node node1, Node node2, Double weight) {
-        this.node1 = node1;
-        this.node2 = node2;
+    public Edge(Node sourceNode, Node targetNode, Double weight) {
+        super();
+        this.sourceNode = sourceNode;
+        this.targetNode = targetNode;
         this.weight = weight;
     }
 
-    public Node getNode1() {
-        return node1;
+    public Node getSourceNode() {
+        return sourceNode;
     }
 
-    public void setNode1(Node node1) {
-        this.node1 = node1;
+    public void setSourceNode(Node sourceNode) {
+        this.sourceNode = sourceNode;
     }
 
-    public Node getNode2() {
-        return node2;
+    public Node getTargetNode() {
+        return targetNode;
     }
 
-    public void setNode2(Node node2) {
-        this.node2 = node2;
+    public void setTargetNode(Node targetNode) {
+        this.targetNode = targetNode;
     }
 
     public Double getWeight() {
@@ -36,16 +37,5 @@ public class Edge {
         this.weight = weight;
     }
 
-    /**
-     * 
-     * @param sourceNode
-     * @return the other node of this edge. SourceNode must not be null and
-     *         must be one of the nodes in this edge
-     */
-    public Node getTarget(Node sourceNode) {
-        if (sourceNode.getIdentifier().equals(node1.getIdentifier())) {
-            return node2;
-        }
-        return node1;
-    }
+    
 }
