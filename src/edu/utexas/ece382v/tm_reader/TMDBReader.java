@@ -1,39 +1,28 @@
 package edu.utexas.ece382v.tm_reader;
 
 import java.io.File;
-import java.io.FileReader;
-import com.opencsv.CSVReader;
+import java.io.IOException;
+import java.util.List;
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 public class TMDBReader {
-  public static void readDataLineByLine(String file) {
 
-    try {
+  public static void main(String[] args) throws IOException {
 
-      // Create an object of filereader
-      // class with CSV file as a parameter.
-      FileReader filereader = new FileReader(file);
+    File csvFile = new File("./data/tmdb_5000_credits.csv");
 
-      // create csvReader object passing
-      // file reader as a parameter
-      CSVReader csvReader = new CSVReader(filereader);
-      String[] nextRecord;
+    CsvMapper csvMapper = new CsvMapper();
 
-      // we are going to read data line by line
-      while ((nextRecord = csvReader.readNext()) != null) {
-        for (String cell : nextRecord) {
-          System.out.print(cell + "\t");
-        }
-        System.out.println();
-      }
-      csvReader.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
+    CsvSchema csvSchema = csvMapper.typedSchemaFor(TMDBRecord.class).withHeader()
+        .withColumnSeparator(',').withComments();
 
-  public static void main(String[] args) {
-    File directory = new File("./");
-    System.out.println(directory.getAbsolutePath());
-    readDataLineByLine("./data/tmdb_5000_credits.csv");
+    MappingIterator<TMDBRecord> recordIter =
+        csvMapper.readerWithTypedSchemaFor(TMDBRecord.class).with(csvSchema).readValues(csvFile);
+
+    List<TMDBRecord> records = recordIter.readAll();
+    System.out.println(records.get(1));
+    // records.forEach(System.out::println);
   }
 }
