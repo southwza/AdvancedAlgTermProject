@@ -1,23 +1,22 @@
 package edu.utexas.ece382v.tm_reader;
 
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 public class TMDBRecord {
-  private String movieId;
+  private List<Crew> crew;
+  private List<Credit> cast;
   private String title;
-  private String cast;
-  private String crew;
+  private String movieId;
 
   public TMDBRecord() {}
 
-  public TMDBRecord(String movieId, String title, String cast, String crew) {
+  @JsonPropertyOrder({"movieId", "title", "cast", "crew"})
+  public TMDBRecord(String movieId, String title, List<Credit> cast, List<Crew> crew) {
     this.movieId = movieId;
     this.title = title;
     this.cast = cast;
     this.crew = crew;
-  }
-
-  @Override
-  public String toString() {
-    return this.movieId + " " + this.title;
   }
 
   public String getMovieId() {
@@ -28,11 +27,18 @@ public class TMDBRecord {
     return this.title;
   }
 
-  public String getCast() {
+  public List<Credit> getCast() {
     return this.cast;
   }
 
-  public String getCrew() {
+  public List<Crew> getCrew() {
     return this.crew;
   }
+
+  @Override
+  public String toString() {
+    return this.movieId + " " + this.title;
+  }
+
+
 }

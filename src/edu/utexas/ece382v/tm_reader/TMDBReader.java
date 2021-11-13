@@ -15,14 +15,13 @@ public class TMDBReader {
 
     CsvMapper csvMapper = new CsvMapper();
 
-    CsvSchema csvSchema = csvMapper.typedSchemaFor(TMDBRecord.class).withHeader()
-        .withColumnSeparator(',').withComments();
+    CsvSchema csvSchema = CsvSchema.builder().addColumn("movieId").addColumn("title")
+        .addColumn("cast").addColumn("crew").build().withHeader();
 
     MappingIterator<TMDBRecord> recordIter =
         csvMapper.readerWithTypedSchemaFor(TMDBRecord.class).with(csvSchema).readValues(csvFile);
-
     List<TMDBRecord> records = recordIter.readAll();
-    System.out.println(records.get(1));
+    System.out.println(records.get(1).getTitle());
     // records.forEach(System.out::println);
   }
 }
