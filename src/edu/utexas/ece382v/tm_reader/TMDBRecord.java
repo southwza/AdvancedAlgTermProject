@@ -1,10 +1,15 @@
 package edu.utexas.ece382v.tm_reader;
 
+import java.io.IOException;
+import java.util.List;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TMDBRecord {
-  // private ArrayList<Crew> crew;
-  // private ArrayList<Credit> cast;
+  private List<Crew> crewList;
+  private List<Credit> castList;
   // private Crew[] crew;
   // private Credit[] cast;
   private String cast;
@@ -14,41 +19,6 @@ public class TMDBRecord {
 
   public TMDBRecord() {}
 
-  public TMDBRecord(String movieId, String title, String cast, String crew) {
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    this.movieId = movieId;
-    this.title = title;
-    this.cast = cast;
-    this.crew = crew;
-
-    // try {
-    // this.cast = objectMapper.readValue(cast, new TypeReference<ArrayList<Credit>>() {});
-    // } catch (JsonParseException e1) {
-    // // TODO Auto-generated catch block
-    // e1.printStackTrace();
-    // } catch (JsonMappingException e1) {
-    // // TODO Auto-generated catch block
-    // e1.printStackTrace();
-    // } catch (IOException e1) {
-    // // TODO Auto-generated catch block
-    // e1.printStackTrace();
-    // }
-    //
-    // try {
-    // this.crew = objectMapper.readValue(crew, new TypeReference<ArrayList<Crew>>() {});
-    // } catch (JsonParseException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // } catch (JsonMappingException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // } catch (IOException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
-  }
-
   public String getMovieId() {
     return this.movieId;
   }
@@ -56,14 +26,6 @@ public class TMDBRecord {
   public String getTitle() {
     return this.title;
   }
-
-  // public ArrayList<Credit> getCast() {
-  // return this.cast;
-  // }
-  //
-  // public ArrayList<Crew> getCrew() {
-  // return this.crew;
-  // }
 
   public String getCast() {
     return this.cast;
@@ -73,18 +35,48 @@ public class TMDBRecord {
     return this.crew;
   }
 
-  // public Credit[] getCast() {
-  // return this.cast;
-  // }
-  //
-  // public Crew[] getCrew() {
-  // return this.crew;
-  // }
-
-  @Override
-  public String toString() {
-    return this.movieId + " " + this.title;
+  public List<Credit> getCastList() {
+    return this.castList;
   }
 
+  public List<Crew> getCrewList() {
+    return this.crewList;
+  }
 
+  public void setCrewAndCastList() {
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    try {
+      this.castList = objectMapper.readValue(this.cast, new TypeReference<List<Credit>>() {});
+
+    } catch (JsonParseException e1) {
+      // TODO Auto-generated catch block
+      System.out.println(this.movieId);
+      e1.printStackTrace();
+    } catch (JsonMappingException e1) {
+      // TODO Auto-generated catch block
+      System.out.println(this.movieId);
+      e1.printStackTrace();
+    } catch (IOException e1) {
+      // TODO Auto-generated catch block
+      System.out.println(this.movieId);
+      e1.printStackTrace();
+    }
+
+    try {
+      this.crewList = objectMapper.readValue(this.crew, new TypeReference<List<Crew>>() {});
+    } catch (JsonParseException e) {
+      // TODO Auto-generated catch block
+      System.out.println(this.movieId);
+      e.printStackTrace();
+    } catch (JsonMappingException e) {
+      // TODO Auto-generated catch block
+      System.out.println(this.movieId);
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      System.out.println(this.movieId);
+      e.printStackTrace();
+    }
+  }
 }

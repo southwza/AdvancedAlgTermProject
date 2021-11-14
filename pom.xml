@@ -14,13 +14,6 @@
 	      <configuration>
 	            <source>11</source> <!-- depending on your project -->
 	            <target>11</target> <!-- depending on your project -->
-	            <annotationProcessorPaths>
-	                  <path>
-	                        <groupId>org.projectlombok</groupId>
-	                        <artifactId>lombok</artifactId>
-	                        <version>1.18.20</version>
-	                  </path>                              
-	            </annotationProcessorPaths>
 	      </configuration>
     	</plugin>
     </plugins>
@@ -62,12 +55,6 @@
 		  <groupId>com.fasterxml.jackson.dataformat</groupId>
 		  <artifactId>jackson-dataformat-csv</artifactId>
 		  <version>2.9.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.22</version>
-			<scope>provided</scope>
 		</dependency>
     </dependencies>
 </project>

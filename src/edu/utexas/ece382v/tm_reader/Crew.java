@@ -1,38 +1,41 @@
 package edu.utexas.ece382v.tm_reader;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@Getter
-@Setter
-@AllArgsConstructor
 public class Crew {
+  @JsonProperty("credit_id")
   private String creditId;
+  @JsonProperty("department")
   private String department;
-  private String gender;
-  private String id;
+  @JsonProperty("gender")
+  private Integer gender;
+  @JsonProperty("id")
+  private Integer id;
+  @JsonProperty("job")
   private String job;
+  @JsonProperty("name")
   private String name;
 
-  // public Crew() {}
+  public Crew() {}
 
-  // public Crew(String credit_id, String department, String gender, String id, String job,
-  // String name) {
-  // this.name = name;
-  // this.credit_id = credit_id;
-  // this.gender = gender;
-  // this.id = id;
-  // this.department = department;
-  // this.job = job;
-  // }
+  public Crew(@JsonProperty("credit_id") String creditId,
+      @JsonProperty("department") String department, @JsonProperty("gender") Integer gender,
+      @JsonProperty("id") Integer id, @JsonProperty("job") String job,
+      @JsonProperty("name") String name) {
+    this.name = name;
+    this.creditId = creditId;
+    this.gender = gender;
+    this.id = id;
+    this.department = department;
+    this.job = job;
+  }
 
   @Override
   public String toString() {
     return this.name + " " + this.id;
   }
 
+  public String getName() {
+    return this.name;
+  }
 }
