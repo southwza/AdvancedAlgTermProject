@@ -1,11 +1,12 @@
 package edu.utexas.ece382v.tm_reader;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TMDBRecord {
   // private ArrayList<Crew> crew;
   // private ArrayList<Credit> cast;
+  // private Crew[] crew;
+  // private Credit[] cast;
   private String cast;
   private String crew;
   private String title;
@@ -13,9 +14,9 @@ public class TMDBRecord {
 
   public TMDBRecord() {}
 
-  @JsonPropertyOrder({"movieId", "title", "cast", "crew"})
   public TMDBRecord(String movieId, String title, String cast, String crew) {
     ObjectMapper objectMapper = new ObjectMapper();
+
     this.movieId = movieId;
     this.title = title;
     this.cast = cast;
@@ -71,6 +72,14 @@ public class TMDBRecord {
   public String getCrew() {
     return this.crew;
   }
+
+  // public Credit[] getCast() {
+  // return this.cast;
+  // }
+  //
+  // public Crew[] getCrew() {
+  // return this.crew;
+  // }
 
   @Override
   public String toString() {

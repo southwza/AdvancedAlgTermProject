@@ -21,7 +21,7 @@ public class TMDBReader {
     MappingIterator<TMDBRecord> recordIter =
         csvMapper.readerWithTypedSchemaFor(TMDBRecord.class).with(csvSchema).readValues(csvFile);
     List<TMDBRecord> records = recordIter.readAll();
-    System.out.println(records.get(1).getTitle());
+    System.out.println(records.get(0));
     // records.forEach(System.out::println);
   }
 }
