@@ -1,22 +1,51 @@
 package edu.utexas.ece382v.tm_reader;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TMDBRecord {
-  private List<Crew> crew;
-  private List<Credit> cast;
+  // private ArrayList<Crew> crew;
+  // private ArrayList<Credit> cast;
+  private String cast;
+  private String crew;
   private String title;
   private String movieId;
 
   public TMDBRecord() {}
 
   @JsonPropertyOrder({"movieId", "title", "cast", "crew"})
-  public TMDBRecord(String movieId, String title, List<Credit> cast, List<Crew> crew) {
+  public TMDBRecord(String movieId, String title, String cast, String crew) {
+    ObjectMapper objectMapper = new ObjectMapper();
     this.movieId = movieId;
     this.title = title;
     this.cast = cast;
     this.crew = crew;
+
+    // try {
+    // this.cast = objectMapper.readValue(cast, new TypeReference<ArrayList<Credit>>() {});
+    // } catch (JsonParseException e1) {
+    // // TODO Auto-generated catch block
+    // e1.printStackTrace();
+    // } catch (JsonMappingException e1) {
+    // // TODO Auto-generated catch block
+    // e1.printStackTrace();
+    // } catch (IOException e1) {
+    // // TODO Auto-generated catch block
+    // e1.printStackTrace();
+    // }
+    //
+    // try {
+    // this.crew = objectMapper.readValue(crew, new TypeReference<ArrayList<Crew>>() {});
+    // } catch (JsonParseException e) {
+    // // TODO Auto-generated catch block
+    // e.printStackTrace();
+    // } catch (JsonMappingException e) {
+    // // TODO Auto-generated catch block
+    // e.printStackTrace();
+    // } catch (IOException e) {
+    // // TODO Auto-generated catch block
+    // e.printStackTrace();
+    // }
   }
 
   public String getMovieId() {
@@ -27,11 +56,19 @@ public class TMDBRecord {
     return this.title;
   }
 
-  public List<Credit> getCast() {
+  // public ArrayList<Credit> getCast() {
+  // return this.cast;
+  // }
+  //
+  // public ArrayList<Crew> getCrew() {
+  // return this.crew;
+  // }
+
+  public String getCast() {
     return this.cast;
   }
 
-  public List<Crew> getCrew() {
+  public String getCrew() {
     return this.crew;
   }
 
