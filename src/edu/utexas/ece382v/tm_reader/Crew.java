@@ -3,17 +3,11 @@ package edu.utexas.ece382v.tm_reader;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Crew {
-  @JsonProperty("credit_id")
   private String creditId;
-  @JsonProperty("department")
   private String department;
-  @JsonProperty("gender")
   private Integer gender;
-  @JsonProperty("id")
   private Integer id;
-  @JsonProperty("job")
   private String job;
-  @JsonProperty("name")
   private String name;
 
   public Crew() {}
@@ -37,5 +31,9 @@ public class Crew {
 
   public String getName() {
     return this.name;
+  }
+
+  public Integer getId() {
+    return this.id;
   }
 }

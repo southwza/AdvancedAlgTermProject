@@ -3,19 +3,12 @@ package edu.utexas.ece382v.tm_reader;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Credit {
-  @JsonProperty("name")
   private String name;
-  @JsonProperty("cast_id")
   private Integer castId;
-  @JsonProperty("character")
   private String character;
-  @JsonProperty("credit_id")
   private String creditId;
-  @JsonProperty("gender")
   private Integer gender;
-  @JsonProperty("id")
   private Integer id;
-  @JsonProperty("order")
   private Integer order;
 
   public Credit(@JsonProperty("name") String name, @JsonProperty("cast_id") Integer castId,

@@ -26,6 +26,8 @@ public class TMDBReader {
       rec.setCrewAndCastList();
     }
     System.out.println(records.get(0).getCastList().get(0).getName());
+    System.out.println(records.get(0).getCastList().get(0).getId());
     System.out.println(records.get(0).getCrewList().get(0).getName());
+    System.out.println(records.get(0).getCrewList().get(0).getId());
   }
 }
