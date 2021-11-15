@@ -15,7 +15,7 @@ public class TestDijkstra {
     void testDijkstra1() throws Exception {
         GraphGenerator graphGenerator = new GraphGenerator();
         Graph g = graphGenerator.generateGraph(2500L, 8, 1F, .9F);
-        System.out.println(g.toString());
+        // System.out.println(g.toString());
         //Calculate the shortest distance from node 0.0 to node 49.49
 
         Double shortestPathDist = DijkstraShortestPath.dijkstraShortestPath(g, g.findNode("0000.0000"), g.findNode("0049.0049"));

@@ -3,7 +3,6 @@ package edu.utexas.ece382v.shortest_path.entities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Node implements Comparable<Node> {
 
@@ -12,6 +11,7 @@ public class Node implements Comparable<Node> {
     private List<Edge> incomingEdges = new ArrayList<>();
     private List<Edge> outgoingEdges = new ArrayList<>();
 
+    private Node predecessor = null;
 
     public Node(String identifier) {
         this.identifier = identifier;
@@ -53,6 +53,14 @@ public class Node implements Comparable<Node> {
 
     public Collection<Edge> getOutgoingEdges() {
         return outgoingEdges;
+    }
+
+    public Node getPredecessor() {
+        return predecessor;
+    }
+
+    public void setPredecessor(Node predecessor) {
+        this.predecessor = predecessor;
     }
 
 }
