@@ -18,16 +18,40 @@ public class TMDBReader {
       for (Credit cred : rec.getCastList()) {
         AgentNode agent = new AgentNode(cred.getId(), cred.getName());
         nodes.add(agent);
+        for (Credit credLink : rec.getCastList()) {
+          if (cred.equals(credLink) == false) {
+            Double weight = Math.abs((double) (cred.getCastId() - credLink.getCastId()));
+            Connection con =
+                new Connection(agent, new AgentNode(credLink.getId(), credLink.getName()), weight,
+                    rec.getMovieId(), rec.getTitle());
+            connections.add(con);
+          }
+        }
       }
       for (Crew crew : rec.getCrewList()) {
         AgentNode agent = new AgentNode(crew.getId(), crew.getName());
         nodes.add(agent);
+        for (Crew crewLink : rec.getCrewList()) {
+          if (crew.equals(crewLink) == false) {
+            Double crewweight = (double) (1);
+            Connection crewcon =
+                new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
+                    crewweight, rec.getMovieId(), rec.getTitle());
+            connections.add(crewcon);
+          }
+        }
       }
     }
     System.out.println(nodes.size());
+    System.out.println(connections.size());
     for (AgentNode agent : nodes) {
       if (agent.getName().equals("Kevin Bacon")) {
         System.out.println(agent + " " + agent.hashCode());
+      }
+    }
+    for (Connection connection : connections) {
+      if (connection.getSourceNode().getName().equals("Kevin Bacon")) {
+        System.out.println(connection);
       }
     }
   }
