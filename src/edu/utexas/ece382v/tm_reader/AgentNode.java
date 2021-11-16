@@ -57,8 +57,7 @@ public class AgentNode implements Comparable<AgentNode> {
 
   @Override
   public int compareTo(AgentNode o) {
-    // Not null safe
-    return this.identifier.compareTo(o.getIdentifier());
+    return this.getIdentifier().compareTo(o.getIdentifier());
   }
 
   public Collection<Edge> getOutgoingEdges() {
@@ -70,13 +69,20 @@ public class AgentNode implements Comparable<AgentNode> {
     return this.identifier + " " + this.name;
   }
 
-  public boolean equals(AgentNode o) {
-    return (o instanceof AgentNode) && (o.getIdentifier()).equals(this.getIdentifier());
+  @Override
+  public boolean equals(Object o) {
+    if (o == null)
+      return false;
+    if (!(o instanceof AgentNode))
+      return false;
+    if (o == this)
+      return true;
+    return this.getIdentifier().equals(((AgentNode) o).getIdentifier());
   }
 
   @Override
   public int hashCode() {
-    return this.identifier.hashCode();
+    return this.getIdentifier();
   }
 
 }

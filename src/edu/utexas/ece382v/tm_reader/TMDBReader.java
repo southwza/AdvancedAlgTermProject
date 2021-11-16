@@ -26,7 +26,9 @@ public class TMDBReader {
     }
     System.out.println(nodes.size());
     for (AgentNode agent : nodes) {
-      System.out.println(agent);
+      if (agent.getName().equals("Kevin Bacon")) {
+        System.out.println(agent + " " + agent.hashCode());
+      }
     }
   }
 
