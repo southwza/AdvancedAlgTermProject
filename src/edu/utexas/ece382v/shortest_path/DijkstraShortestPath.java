@@ -53,6 +53,8 @@ public class DijkstraShortestPath {
                 }
 
                 targetNode.setWeight(fixedNode.getWeight() + edge.getWeight());
+                targetNode.setPredecessor(fixedNode); //We'll keep track of the predecessor node so that we can construct the shortest path
+
                 minHeap.insertOrAdjust(targetNode);
 
             }

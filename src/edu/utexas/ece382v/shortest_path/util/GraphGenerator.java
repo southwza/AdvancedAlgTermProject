@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -89,7 +90,7 @@ public class GraphGenerator {
         // node.
         // Will define that for now as edgeweight^3 * n in order to try getting a
         // reasonable value.
-        int searchDistance = (int) (Math.pow(edgeWeight, 3) * graphDimension);
+        int searchDistance = (int) (Math.pow(edgeWeight, 3) * graphDimension) + 2;
 
         // If n is large, it may mean that we need to increase the search distance in
         // order to find enough nodes to
@@ -180,4 +181,76 @@ public class GraphGenerator {
         return (euclideanFactor * euclideanComponent) + (1 - euclideanFactor) * randomComponent;
     }
 
+    /**
+     * Given an input graph, generates a sub-graph which includes the specified target node, all
+     * nodes that are 'degree' degrees of separation, and all edges that connect these nodes. Will
+     * use this reduced graph to generate a visualization of a path in the graph
+     * @param g
+     * @param target
+     * @param degree
+     * @return
+     */
+    public Graph generateSubGraph(Node target, int degree) {
+        Graph outputGraph = new Graph();
+        Node node = target;
+
+        //First, let's add all the nodes from the source to the target.
+        outputGraph.getNodes().add(target);
+        while (node.getPredecessor()!= null) {
+            node = node.getPredecessor();
+            outputGraph.getNodes().add(node);
+        }
+
+        //let's add all the connected nodes (up to the specified degree). We're doing this in a
+        //separate while loop because we want to remove any 'predecessor' node specification to
+        //any of these nodes that we add. Since we will have already added all of the predecessor
+        //nodes from our target, then we won't accidentally remove a predecessor along our main path.
+        node = target;
+        while (node.getPredecessor()!= null) {
+            addOutgoingNodes(outputGraph, node, degree);
+            node = node.getPredecessor();
+        }
+
+        //Now we need to handle edges
+        for (Node n : outputGraph.getNodes()) {
+            List<Edge> edgesToRemove = new ArrayList<>();
+
+            for (Edge e : n.getOutgoingEdges()) {
+                if (outputGraph.getNodes().contains(e.getTargetNode())) {
+                    outputGraph.getEdges().add(e);
+                } else {
+                    edgesToRemove.add(e);
+                }
+            }
+            edgesToRemove.forEach(e -> n.getOutgoingEdges().remove(e));
+
+            edgesToRemove.clear();
+            for (Edge e : n.getIncomingEdges()) {
+                if (!outputGraph.getNodes().contains(e.getSourceNode())) {
+                    edgesToRemove.add(e);
+                }
+            }
+            edgesToRemove.forEach(e -> n.getIncomingEdges().remove(e));
+        }
+
+        return outputGraph;
+    }
+
+    private void addOutgoingNodes(Graph outputGraph, Node node, int degree) {
+        //Add this node
+        if (!outputGraph.getNodes().contains(node)) {
+            node.setPredecessor(null);
+            outputGraph.getNodes().add(node);
+        }
+        //Base case: the degree is 1, don't add any additional nodes.
+        if (degree <= 1) {
+            return;
+        }
+
+        //recursive step: add child nodes
+        node.getOutgoingEdges().forEach(edge -> {
+            addOutgoingNodes(outputGraph, edge.getTargetNode(), degree - 1);
+        });
+
+    }
 }

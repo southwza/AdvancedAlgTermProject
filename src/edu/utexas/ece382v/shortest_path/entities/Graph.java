@@ -24,9 +24,9 @@ public class Graph {
         this.nodes = nodes;
     }
 
-//    public List<Edge> getEdges() {
-//        return edges;
-//    }
+    public List<Edge> getEdges() {
+        return edges;
+    }
 
     public void setEdges(List<Edge> edges) {
         this.edges = edges;
@@ -69,5 +69,45 @@ public class Graph {
 
     public double averageEdgeWeight() {
         return edges.stream().mapToDouble(edge -> edge.getWeight()).average().getAsDouble();
+    }
+
+    /**
+     * Generates an output file suitable for input to GraphVis graph generator.
+     * Ex: save this output to a file and execute the following command line after installing GraphVis:
+     * $> dot -O -Tpng {file}
+     * @return
+     */
+    public String toDotString(Graph g, Node targetNode) {
+        String dotString = "digraph G {" + System.lineSeparator();
+
+        Node sourceNode = targetNode;
+        while (sourceNode.getPredecessor() != null) {
+            sourceNode = sourceNode.getPredecessor();
+        }
+
+        for (Node n : g.getNodes()) {
+            String color = "";
+            if (n.equals(sourceNode)) {
+                color = "[ style = filled, fillcolor = green ]";
+            } else if (n.equals(targetNode)) {
+                color = "[ style = filled, fillcolor = red ]";
+            }
+            dotString += "  " + n.getIdentifier() + System.lineSeparator() + color;
+        }
+
+        dotString += System.lineSeparator();
+
+        for (Edge e : g.getEdges()) {
+            String color = "";
+            //Is this a connecting edge along the shortest path?
+            
+            if (e.getSourceNode().equals(e.getTargetNode().getPredecessor())) {
+                color = "; color = green; penwidth = 10";
+            }
+            String label = " [label = \"" + e.getWeight() + "\"" + color + "]";
+            dotString += "  " + e.getSourceNode().getIdentifier() + " -> " + e.getTargetNode().getIdentifier() + label + System.lineSeparator();
+        }
+        dotString += "}";
+        return dotString;
     }
 }

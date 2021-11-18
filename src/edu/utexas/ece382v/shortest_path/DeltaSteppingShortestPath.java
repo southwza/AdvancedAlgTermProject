@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import edu.utexas.ece382v.shortest_path.entities.Edge;
@@ -21,10 +25,13 @@ public class DeltaSteppingShortestPath {
 
     private long sequentialTime = 0;
     private long parallelTime = 0;
+    private int threads = 0;
 
+    private ExecutorService executorService;
+    private ForkJoinPool forkJoinPool;
 
     public Double calculateShortestPath(Graph g, Node source, Node target, double delta) {
-        return calculateShortestPath(g, source, target, delta, false, false);
+        return calculateShortestPath(g, source, target, delta, false, Runtime.getRuntime().availableProcessors());
     }
 
     /**
@@ -37,7 +44,11 @@ public class DeltaSteppingShortestPath {
      * @param singleThread Perform the delta stepping calculation sequentially
      * @return
      */
-    public Double calculateShortestPath(Graph g, Node source, Node target, Double delta, boolean printStats, boolean singleThread) {
+    public Double calculateShortestPath(Graph g, Node source, Node target, Double delta, boolean printStats, int threads) {
+        this.threads = threads;
+        executorService = Executors.newFixedThreadPool(threads);
+        forkJoinPool = new ForkJoinPool(threads);
+
         sequentialTime = 0;
         parallelTime = 0;
 
@@ -54,7 +65,7 @@ public class DeltaSteppingShortestPath {
         B = new ConcurrentSkipListMap<>(); //List of buckets (Well, really a map, but the key is an integer representing an 'index')
 
         //Initialize our source node and first bucket
-        relax(source, 0D);
+        relax(source, 0D, null);
 
         //In our outer while loop, we'll process each bucket in our list of buckets
         while (B.size() > 0) {
@@ -84,16 +95,9 @@ public class DeltaSteppingShortestPath {
                 S.addAll(bucket);
                 bucket.clear();
 
-                if (singleThread) {
-                    req.entrySet().stream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
-                } else {
-                    end = System.nanoTime();
-                    sequentialTime += end - start;
-                    //relax light nodes in parallel
-                    req.entrySet().parallelStream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
-                    start = System.nanoTime();
-                    parallelTime += start - end;
-                }
+                //relax light nodes in parallel
+                relaxInParallel(req);
+
             }
 
             //If S contains our target node, then we can short-circuit and return it now
@@ -117,16 +121,7 @@ public class DeltaSteppingShortestPath {
                                 return edge2Relaxation < edge1Relaxation ? edge2 : edge1;
                             }));
             //relax heavy nodes in parallel
-            if (singleThread) {
-                req.entrySet().stream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
-            } else {
-                end = System.nanoTime();
-                sequentialTime += end - start;
-                //relax light nodes in parallel
-                req.entrySet().parallelStream().forEach(entry -> relax(entry.getKey(), calculateRelaxation(entry.getValue())));
-                start = System.nanoTime();
-                parallelTime += start - end;
-            }
+            relaxInParallel(req);
 
             //Let's remove this bucket.
             B.pollFirstEntry();
@@ -138,21 +133,34 @@ public class DeltaSteppingShortestPath {
         return target.getWeight().equals(Double.MAX_VALUE) ? null : target.getWeight();
     }
 
+    private void relaxInParallel(Map<Node, Edge> req) {
+        end = System.nanoTime();
+        sequentialTime += end - start;
+        req.entrySet().stream().forEach(entry -> 
+            forkJoinPool.submit(() -> relax(entry.getKey(), calculateRelaxation(entry.getValue()), entry.getValue().getSourceNode()))
+        );
+        forkJoinPool.awaitQuiescence(1, TimeUnit.MINUTES);
+        start = System.nanoTime();
+        parallelTime += start - end;
+    }
+
     private void printStats() {
         end = System.nanoTime();
         sequentialTime += end - start;
 
+        System.out.println("Execution statistics");
+        System.out.println("Number of processors available on this system: " + Runtime.getRuntime().availableProcessors());
+        System.out.println("Number of threads used in this execution: " + threads);
         System.out.println("Sequential time: " + sequentialTime / 1000000);
         System.out.println("Parallel time: " + parallelTime / 1000000);
         System.out.println("p / p + s: " + ((parallelTime + 0.0) / (parallelTime + sequentialTime)));
-
     }
 
     private double calculateRelaxation(Edge edge) {
         return edge.getSourceNode().getWeight() + edge.getWeight();
     }
 
-    private void relax(Node node, double weight) {
+    private void relax(Node node, double weight, Node sourceNode) {
         if (weight < node.getWeight()) {
             if (node.getWeight().equals(Double.MAX_VALUE)) {
                 int prevBucketIndex = Double.valueOf(node.getWeight() / delta).intValue();
@@ -161,6 +169,7 @@ public class DeltaSteppingShortestPath {
                 }
             }
             node.setWeight(weight);
+            node.setPredecessor(sourceNode);
             int bucketIndex = Double.valueOf(weight / delta).intValue();
             if (!B.containsKey(bucketIndex)) {
                 B.putIfAbsent(bucketIndex, new ConcurrentSkipListSet<>());

@@ -10,9 +10,9 @@ import edu.utexas.ece382v.shortest_path.entities.Graph;
 import edu.utexas.ece382v.shortest_path.entities.Node;
 import edu.utexas.ece382v.shortest_path.util.GraphGenerator;
 
-public class TestDeltaStepping {
+public class TestBellmanFord {
     @Test
-    void testDeltaStepping() throws Exception {
+    void testBellmanFord() throws Exception {
         Long nodes = 40000L;
 
         GraphGenerator graphGenerator = new GraphGenerator();
@@ -25,17 +25,16 @@ public class TestDeltaStepping {
         Double shortestPathDist = DijkstraShortestPath.dijkstraShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode));
         System.out.println("Dijkstra shortest path from " + sourceNode + " to " + targetNode + ": " + shortestPathDist + System.lineSeparator());
 
-        DeltaSteppingShortestPath ds = new DeltaSteppingShortestPath();
+        BellmanFordShortestPath bf = new BellmanFordShortestPath();
 
-        Double delta = 30D;
-        Double deltaSteppingShortestPathDist = ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta);
-        System.out.println("Delta Stepping shortest path with delta of " + delta + ": " + deltaSteppingShortestPathDist + System.lineSeparator());
+        Double bellmanFordShortestPathDist = bf.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode));
+        System.out.println("Bellman-Ford shortest path: " + bellmanFordShortestPathDist + System.lineSeparator());
 
-        assertEquals(shortestPathDist, deltaSteppingShortestPathDist);
+        assertEquals(shortestPathDist, bellmanFordShortestPathDist);
     }
 
     @Test
-    void testDeltaStepping2() throws Exception {
+    void testBellmanFord2() throws Exception {
 
         Graph g = new Graph();
 
@@ -58,11 +57,11 @@ public class TestDeltaStepping {
 
         g.addEdge(node_4, node_5, 80);
 
-        DeltaSteppingShortestPath ds = new DeltaSteppingShortestPath();
+        BellmanFordShortestPath bf = new BellmanFordShortestPath();
 
-        assertEquals(22, ds.calculateShortestPath(g, node_1, node_2, 2D));
-        assertEquals(32, ds.calculateShortestPath(g, node_1, node_3, 2D));
-        assertEquals(39, ds.calculateShortestPath(g, node_1, node_4, 2D));
-        assertEquals(77, ds.calculateShortestPath(g, node_1, node_5, 2D));
+        assertEquals(22, bf.calculateShortestPath(g, node_1, node_2));
+        assertEquals(32, bf.calculateShortestPath(g, node_1, node_3));
+        assertEquals(39, bf.calculateShortestPath(g, node_1, node_4));
+        assertEquals(77, bf.calculateShortestPath(g, node_1, node_5));
     }
 }
