@@ -3,6 +3,7 @@ package edu.utexas.ece382v.tm_reader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -11,7 +12,34 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 public class TMDBReader {
   private static HashSet<AgentNode> nodes = new HashSet<AgentNode>();
+  private static HashMap<Integer, ArrayList<Connection>> inconnections =
+      new HashMap<Integer, ArrayList<Connection>>();
+  private static HashMap<Integer, ArrayList<Connection>> outconnections =
+      new HashMap<Integer, ArrayList<Connection>>();
   private static ArrayList<Connection> connections = new ArrayList<Connection>();
+
+  private static void insertConnection(Connection edge) {
+    Integer to = edge.getTargetNode().getIdentifier();
+    Integer from = edge.getSourceNode().getIdentifier();
+
+    if (outconnections.containsKey(from)) {
+      outconnections.get(from).add(edge);
+    } else {
+      ArrayList<Connection> edges = new ArrayList<Connection>();
+      edges.add(edge);
+      outconnections.put(from, edges);
+    }
+
+    if (inconnections.containsKey(to)) {
+      inconnections.get(to).add(edge);
+    } else {
+      ArrayList<Connection> edges = new ArrayList<Connection>();
+      edges.add(edge);
+      inconnections.put(to, edges);
+    }
+
+    connections.add(edge);
+  }
 
   private static void buildGraph(List<TMDBRecord> records) {
     for (TMDBRecord rec : records) {
@@ -20,11 +48,11 @@ public class TMDBReader {
         nodes.add(agent);
         for (Credit credLink : rec.getCastList()) {
           if (cred.equals(credLink) == false) {
-            Double weight = Math.abs((double) (cred.getCastId() - credLink.getCastId()));
+            Double weight = Math.abs((double) (cred.getOrder() - credLink.getOrder()));
             Connection con =
                 new Connection(agent, new AgentNode(credLink.getId(), credLink.getName()), weight,
                     rec.getMovieId(), rec.getTitle());
-            connections.add(con);
+            insertConnection(con);
           }
         }
         for (Crew crewLink : rec.getCrewList()) {
@@ -33,7 +61,7 @@ public class TMDBReader {
             Connection crewcon =
                 new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
                     crewweight, rec.getMovieId(), rec.getTitle());
-            connections.add(crewcon);
+            insertConnection(crewcon);
           }
         }
       }
@@ -46,7 +74,7 @@ public class TMDBReader {
             Connection crewcon =
                 new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
                     crewweight, rec.getMovieId(), rec.getTitle());
-            connections.add(crewcon);
+            insertConnection(crewcon);
           }
         }
         for (Credit credLink : rec.getCastList()) {
@@ -55,10 +83,23 @@ public class TMDBReader {
             Connection con =
                 new Connection(agent, new AgentNode(credLink.getId(), credLink.getName()), weight,
                     rec.getMovieId(), rec.getTitle());
-            connections.add(con);
+            insertConnection(con);
           }
         }
       }
+    }
+  }
+
+  public static void applyEdges() {
+    int i = 0;
+    System.out.println("processing apply edges...");
+    for (AgentNode node : nodes) {
+      i = i + 1;
+      if (i % 10000 == 0) {
+        System.out.println("processing: " + i + "...");
+      }
+      node.setIncomingEdges(inconnections.get(node.getIdentifier()));
+      node.setOutgoingEdges(outconnections.get(node.getIdentifier()));
     }
   }
 
@@ -97,6 +138,7 @@ public class TMDBReader {
     }
 
     buildGraph(records);
+    applyEdges();
     computeGraphStats();
     computeStats("Rob Reiner");
     computeStats("Kevin Bacon");

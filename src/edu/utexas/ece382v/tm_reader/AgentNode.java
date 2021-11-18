@@ -1,17 +1,15 @@
 package edu.utexas.ece382v.tm_reader;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import edu.utexas.ece382v.shortest_path.entities.Edge;
 
 public class AgentNode implements Comparable<AgentNode> {
 
   private Integer identifier;
   private String name;
   private Double weight;
-  private List<Edge> incomingEdges = new ArrayList<>();
-  private List<Edge> outgoingEdges = new ArrayList<>();
+  private List<Connection> incomingEdges = new ArrayList<>();
+  private List<Connection> outgoingEdges = new ArrayList<>();
 
 
   public AgentNode(Integer identifier, String name) {
@@ -43,15 +41,15 @@ public class AgentNode implements Comparable<AgentNode> {
     this.weight = weight;
   }
 
-  public List<Edge> getIncomingEdges() {
+  public List<Connection> getIncomingEdges() {
     return this.incomingEdges;
   }
 
-  public void setIncomingEdges(List<Edge> incomingEdges) {
+  public void setIncomingEdges(List<Connection> incomingEdges) {
     this.incomingEdges = incomingEdges;
   }
 
-  public void setOutgoingEdges(List<Edge> outgoingEdges) {
+  public void setOutgoingEdges(List<Connection> outgoingEdges) {
     this.outgoingEdges = outgoingEdges;
   }
 
@@ -60,7 +58,7 @@ public class AgentNode implements Comparable<AgentNode> {
     return this.getIdentifier().compareTo(o.getIdentifier());
   }
 
-  public Collection<Edge> getOutgoingEdges() {
+  public List<Connection> getOutgoingEdges() {
     return this.outgoingEdges;
   }
 
