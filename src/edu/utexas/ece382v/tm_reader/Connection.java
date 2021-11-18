@@ -44,7 +44,7 @@ public class Connection {
 
   @Override
   public String toString() {
-    return this.sourceNode.getName() + " " + this.filmName + " " + this.weight + " "
+    return this.sourceNode.getName() + " ---> " + this.filmName + " @" + this.weight + " ---> "
         + this.targetNode.getName();
   }
 

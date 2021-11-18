@@ -27,17 +27,35 @@ public class TMDBReader {
             connections.add(con);
           }
         }
+        for (Crew crewLink : rec.getCrewList()) {
+          if (cred.getId().equals(crewLink.getId()) == false) {
+            Double crewweight = (double) (50);
+            Connection crewcon =
+                new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
+                    crewweight, rec.getMovieId(), rec.getTitle());
+            connections.add(crewcon);
+          }
+        }
       }
       for (Crew crew : rec.getCrewList()) {
         AgentNode agent = new AgentNode(crew.getId(), crew.getName());
         nodes.add(agent);
         for (Crew crewLink : rec.getCrewList()) {
           if (crew.equals(crewLink) == false) {
-            Double crewweight = (double) (1);
+            Double crewweight = (double) (5);
             Connection crewcon =
                 new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
                     crewweight, rec.getMovieId(), rec.getTitle());
             connections.add(crewcon);
+          }
+        }
+        for (Credit credLink : rec.getCastList()) {
+          if (crew.getId().equals(credLink.getId()) == false) {
+            Double weight = (double) (50);
+            Connection con =
+                new Connection(agent, new AgentNode(credLink.getId(), credLink.getName()), weight,
+                    rec.getMovieId(), rec.getTitle());
+            connections.add(con);
           }
         }
       }
@@ -74,9 +92,6 @@ public class TMDBReader {
     }
 
     buildGraph(records);
-    System.out.println(records.get(0).getCastList().get(0).getName());
-    System.out.println(records.get(0).getCastList().get(0).getId());
-    System.out.println(records.get(0).getCrewList().get(0).getName());
-    System.out.println(records.get(0).getCrewList().get(0).getId());
+    System.out.println("---- DONE ----");
   }
 }
