@@ -35,7 +35,15 @@ public class Connection {
   }
 
   public Double getWeight() {
-    return weight;
+    return this.weight;
+  }
+
+  public Integer getFilmId() {
+    return this.filmId;
+  }
+
+  public String getFilmName() {
+    return this.filmName;
   }
 
   public void setWeight(Double weight) {

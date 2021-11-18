@@ -60,18 +60,23 @@ public class TMDBReader {
         }
       }
     }
-    System.out.println(nodes.size());
-    System.out.println(connections.size());
-    for (AgentNode agent : nodes) {
-      if (agent.getName().equals("Kevin Bacon")) {
-        System.out.println(agent + " " + agent.hashCode());
-      }
-    }
+  }
+
+  public static void computeStats(String agent) {
+    HashSet<Integer> films = new HashSet<Integer>();
+    int i = 0;
     for (Connection connection : connections) {
-      if (connection.getSourceNode().getName().equals("Kevin Bacon")) {
-        System.out.println(connection);
+      if (connection.getSourceNode().getName().equals(agent)) {
+        i = i + 1;
+        films.add(connection.getFilmId());
       }
     }
+    System.out.println(agent + " has " + i + " connections from " + films.size() + " films");
+  }
+
+  public static void computeGraphStats() {
+    System.out.println("Nodes: " + nodes.size());
+    System.out.println("Edges: " + connections.size());
   }
 
   public static void main(String[] args) throws IOException {
@@ -92,6 +97,13 @@ public class TMDBReader {
     }
 
     buildGraph(records);
+    computeGraphStats();
+    computeStats("Rob Reiner");
+    computeStats("Kevin Bacon");
+    computeStats("Drew Barrymore");
+    computeStats("Owen Wilson");
+    computeStats("Aubrey Plaza");
+    computeStats("Julie Andrews");
     System.out.println("---- DONE ----");
   }
 }
