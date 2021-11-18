@@ -15,11 +15,11 @@ public class TMDBRecord {
   private String cast;
   private String crew;
   private String title;
-  private String movieId;
+  private Integer movieId;
 
   public TMDBRecord() {}
 
-  public String getMovieId() {
+  public Integer getMovieId() {
     return this.movieId;
   }
 
