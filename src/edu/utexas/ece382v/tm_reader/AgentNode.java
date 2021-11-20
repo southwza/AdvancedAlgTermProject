@@ -11,6 +11,8 @@ public class AgentNode implements Comparable<AgentNode> {
   private List<Connection> incomingEdges = new ArrayList<>();
   private List<Connection> outgoingEdges = new ArrayList<>();
 
+  private AgentNode predecessor = null;
+
 
   public AgentNode(Integer identifier, String name) {
     this.identifier = identifier;
@@ -81,6 +83,14 @@ public class AgentNode implements Comparable<AgentNode> {
   @Override
   public int hashCode() {
     return this.getIdentifier();
+  }
+
+  public AgentNode getPredecessor() {
+    return predecessor;
+  }
+
+  public void setPredecessor(AgentNode predecessor) {
+    this.predecessor = predecessor;
   }
 
 }

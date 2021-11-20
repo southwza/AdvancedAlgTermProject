@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -120,8 +121,7 @@ public class TMDBReader {
     System.out.println("Edges: " + connections.size());
   }
 
-  public static void main(String[] args) throws IOException {
-
+  public static TMDBGraph generateGraph() throws IOException {
     File csvFile = new File("./data/tmdb_5000_credits.csv");
 
     CsvMapper csvMapper = new CsvMapper();
@@ -139,6 +139,16 @@ public class TMDBReader {
 
     buildGraph(records);
     applyEdges();
+    System.out.println("---- DONE ----");
+
+    ArrayList<AgentNode> nodeslist =
+        (ArrayList<AgentNode>) nodes.stream().collect(Collectors.toList());
+
+    TMDBGraph g = new TMDBGraph(nodeslist, connections);
+    return g;
+  }
+
+  public static void printStats() {
     computeGraphStats();
     computeStats("Rob Reiner");
     computeStats("Kevin Bacon");
@@ -146,6 +156,5 @@ public class TMDBReader {
     computeStats("Owen Wilson");
     computeStats("Aubrey Plaza");
     computeStats("Julie Andrews");
-    System.out.println("---- DONE ----");
   }
 }
