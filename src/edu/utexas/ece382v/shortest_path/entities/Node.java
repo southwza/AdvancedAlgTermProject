@@ -2,7 +2,10 @@ package edu.utexas.ece382v.shortest_path.entities;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+
+import edu.utexas.ece382v.tm_reader.AgentNode;
 
 public class Node implements Comparable<Node> {
 
@@ -48,7 +51,7 @@ public class Node implements Comparable<Node> {
     @Override
     public int compareTo(Node o) {
         //Not null safe
-        return weight.compareTo(o.getWeight());
+        return Comparator.comparing(Node::getWeight).thenComparing(Node::getIdentifier).compare(this, o);
     }
 
     public Collection<Edge> getOutgoingEdges() {

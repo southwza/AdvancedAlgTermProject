@@ -160,11 +160,9 @@ public class DeltaSteppingTMDB {
 
   private void relax(AgentNode node, double weight, AgentNode sourceNode) {
     if (weight < node.getWeight()) {
-      if (node.getWeight().equals(Double.MAX_VALUE)) {
+      if (!node.getWeight().equals(Double.MAX_VALUE)) {
         int prevBucketIndex = Double.valueOf(node.getWeight() / delta).intValue();
-        if (B.containsKey(prevBucketIndex)) {
-          B.get(prevBucketIndex).remove(node);
-        }
+        B.get(prevBucketIndex).remove(node);
       }
       node.setWeight(weight);
       node.setPredecessor(sourceNode);

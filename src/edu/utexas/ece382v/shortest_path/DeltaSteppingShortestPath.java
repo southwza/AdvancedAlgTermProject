@@ -100,14 +100,17 @@ public class DeltaSteppingShortestPath {
 
             }
 
-            //If S contains our target node, then we can short-circuit and return it now
-            if (S.contains(target)) {
-                if (printStats) {
-                    printStats();
-                }
-
-                return target.getWeight();
-            }
+            //If S contains our target node, then we could short-circuit and return it now
+            //However, let's allow the algorithm to complete and find the shortest path to
+            //each node in order to get a benchmark for the Single Shortest Path Problem
+            //in which we are required to find the shortest path for each connected node
+//            if (S.contains(target)) {
+//                if (printStats) {
+//                    printStats();
+//                }
+//
+//                return target.getWeight();
+//            }
 
             //Now, let's relax all the heavy nodes from our bucket
             req = S.stream().flatMap(node -> node.getOutgoingEdges().stream())
@@ -162,11 +165,9 @@ public class DeltaSteppingShortestPath {
 
     private void relax(Node node, double weight, Node sourceNode) {
         if (weight < node.getWeight()) {
-            if (node.getWeight().equals(Double.MAX_VALUE)) {
+            if (!node.getWeight().equals(Double.MAX_VALUE)) {
                 int prevBucketIndex = Double.valueOf(node.getWeight() / delta).intValue();
-                if (B.containsKey(prevBucketIndex)) {
-                    B.get(prevBucketIndex).remove(node);
-                }
+                B.get(prevBucketIndex).remove(node);
             }
             node.setWeight(weight);
             node.setPredecessor(sourceNode);

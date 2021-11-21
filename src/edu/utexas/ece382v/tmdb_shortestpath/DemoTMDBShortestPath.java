@@ -61,7 +61,7 @@ public class DemoTMDBShortestPath {
 
     DeltaSteppingTMDB ds = new DeltaSteppingTMDB();
 
-    Double delta = 20D;
+    Double delta = 1D;
     start = System.nanoTime();
     Double deltaSteppingShortestPathDist =
         ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta);

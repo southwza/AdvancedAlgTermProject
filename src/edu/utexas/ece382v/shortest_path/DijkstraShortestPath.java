@@ -34,10 +34,15 @@ public class DijkstraShortestPath {
         while (!minHeap.isEmpty()) {
             Node fixedNode = minHeap.poll();
             fixedNodes.add(fixedNode);
-            if (fixedNodes.contains(target)) {
-                //We can stop once the target node is fixed
-                break;
-            }
+
+            //If fixedNodes contains our target node, then we could short-circuit and return it now
+            //However, let's allow the algorithm to complete and find the shortest path to
+            //each node in order to get a benchmark for the Single Shortest Path Problem
+            //in which we are required to find the shortest path for each connected node
+//            if (fixedNodes.contains(target)) {
+//                //We can stop once the target node is fixed
+//                break;
+//            }
 
             List<Edge> newEdges = fixedNode.getOutgoingEdges().stream() // Stream over outgoing edges
                     .filter(edge -> !fixedNodes.contains(edge.getTargetNode())) // Remove those already fixed

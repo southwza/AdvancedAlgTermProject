@@ -1,6 +1,7 @@
 package edu.utexas.ece382v.tm_reader;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class AgentNode implements Comparable<AgentNode> {
@@ -95,7 +96,7 @@ public class AgentNode implements Comparable<AgentNode> {
 
   @Override
   public int compareTo(AgentNode o) {
-    // Not null safe
-    return weight.compareTo(o.getWeight());
+      // Not null safe
+      return Comparator.comparing(AgentNode::getWeight).thenComparing(AgentNode::getIdentifier).compare(this, o);
   }
 }
