@@ -122,10 +122,7 @@ public class DeltaSteppingTMDB {
       // Let's remove this bucket.
       B.pollFirstEntry();
     }
-    // if (printStats) {
     printStats();
-    // }
-    printPath(target);
     return target.getWeight().equals(Double.MAX_VALUE) ? null : target.getWeight();
     // return target.getWeight();
   };
@@ -177,14 +174,5 @@ public class DeltaSteppingTMDB {
       }
       B.get(bucketIndex).add(node);
     }
-  }
-
-  public static void printPath(AgentNode node) {
-    AgentNode pathNode = node;
-    while (pathNode.getPredecessor() != null) {
-      System.out.println(pathNode);
-      pathNode = pathNode.getPredecessor();
-    }
-    System.out.println(pathNode);
   }
 }

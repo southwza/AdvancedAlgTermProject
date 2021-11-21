@@ -60,16 +60,6 @@ public class DijkstraTMDB {
 
       }
     }
-    printPath(target);
     return target.getWeight();
-  }
-
-  public static void printPath(AgentNode node) {
-    AgentNode pathNode = node;
-    while (pathNode.getPredecessor() != null) {
-      System.out.println(pathNode);
-      pathNode = pathNode.getPredecessor();
-    }
-    System.out.println(pathNode);
   }
 }
