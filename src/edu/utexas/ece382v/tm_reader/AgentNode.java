@@ -36,7 +36,7 @@ public class AgentNode implements Comparable<AgentNode> {
   }
 
   public Double getWeight() {
-    return this.weight;
+    return weight;
   }
 
   public void setWeight(Double weight) {
@@ -93,56 +93,9 @@ public class AgentNode implements Comparable<AgentNode> {
     this.predecessor = predecessor;
   }
 
-  // private Node predecessor = null;
-
-  // public Node(String identifier) {
-  // this.identifier = identifier;
-  // }
-  //
-  // public String getIdentifier() {
-  // return identifier;
-  // }
-  //
-  // public void setIdentifier(String identifier) {
-  // this.identifier = identifier;
-  // }
-
-  // public Double getWeight() {
-  // return weight;
-  // }
-  //
-  // public void setWeight(Double weight) {
-  // this.weight = weight;
-  // }
-  //
-  // public List<Edge> getIncomingEdges() {
-  // return incomingEdges;
-  // }
-  //
-  // public void setIncomingEdges(List<Edge> incomingEdges) {
-  // this.incomingEdges = incomingEdges;
-  // }
-  //
-  // public void setOutgoingEdges(List<Edge> outgoingEdges) {
-  // this.outgoingEdges = outgoingEdges;
-  // }
-
   @Override
   public int compareTo(AgentNode o) {
     // Not null safe
     return weight.compareTo(o.getWeight());
   }
-  //
-  // public Collection<Edge> getOutgoingEdges() {
-  // return outgoingEdges;
-  // }
-  //
-  // public Node getPredecessor() {
-  // return predecessor;
-  // }
-  //
-  // public void setPredecessor(Node predecessor) {
-  // this.predecessor = predecessor;
-  // }
-
 }

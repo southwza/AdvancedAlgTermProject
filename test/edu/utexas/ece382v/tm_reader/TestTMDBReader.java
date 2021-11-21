@@ -14,5 +14,6 @@ public class TestTMDBReader {
     }
     assertEquals(104842, g.getNodes().size(), "Should have 104842 nodes");
     assertEquals(20079886, g.getEdges().size(), "Should have 20079886 edges");
+
   }
 }

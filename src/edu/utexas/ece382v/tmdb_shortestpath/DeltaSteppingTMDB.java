@@ -70,7 +70,7 @@ public class DeltaSteppingTMDB {
     // Initialize our source node and first bucket
     relax(source, 0D, null);
 
-    // In our outer while loop, we'll process each bucket in our list of buckets
+    // In our outer while loop, we'll process each bucket in our list of buckets]
     while (B.size() > 0) {
       S = new HashSet<AgentNode>();
       Set<AgentNode> bucket = B.firstEntry().getValue();
@@ -86,7 +86,6 @@ public class DeltaSteppingTMDB {
             .collect(Collectors.toMap(e -> e.getTargetNode(), e -> e, (edge1, edge2) -> {
               double edge1Relaxation = calculateRelaxation(edge1);
               double edge2Relaxation = calculateRelaxation(edge2);
-              System.out.println(edge1 + " " + edge2);
               return edge2Relaxation < edge1Relaxation ? edge2 : edge1;
             }));
         // Just a quick note about the stream expression above: we have the possibility
@@ -94,6 +93,7 @@ public class DeltaSteppingTMDB {
         // handled by the mergeFunction in the collector which takes the tightest
         // relaxation for a given target node
         S.addAll(bucket);
+
         bucket.clear();
 
         // relax light nodes in parallel
@@ -106,7 +106,6 @@ public class DeltaSteppingTMDB {
         if (printStats) {
           printStats();
         }
-
         return target.getWeight();
       }
 
@@ -120,7 +119,6 @@ public class DeltaSteppingTMDB {
           }));
       // relax heavy nodes in parallel
       relaxInParallel(req);
-
       // Let's remove this bucket.
       B.pollFirstEntry();
     }
@@ -128,7 +126,8 @@ public class DeltaSteppingTMDB {
       printStats();
     }
     return target.getWeight().equals(Double.MAX_VALUE) ? null : target.getWeight();
-  }
+    // return target.getWeight();
+  };
 
   private void relaxInParallel(Map<AgentNode, Connection> req) {
     end = System.nanoTime();
@@ -138,6 +137,7 @@ public class DeltaSteppingTMDB {
     forkJoinPool.awaitQuiescence(1, TimeUnit.MINUTES);
     start = System.nanoTime();
     parallelTime += start - end;
+    System.out.println(req);
   }
 
   private void printStats() {
@@ -154,14 +154,11 @@ public class DeltaSteppingTMDB {
   }
 
   private double calculateRelaxation(Connection edge) {
-    System.out.println("sourcenode weight " + edge.getSourceNode().getWeight() + " "
-        + edge.getSourceNode() + " ----- " + edge);
     if (edge.getSourceNode().getWeight() != null) {
       return edge.getSourceNode().getWeight() + edge.getWeight();
     } else {
       return 0;
     }
-
   }
 
   private void relax(AgentNode node, double weight, AgentNode sourceNode) {

@@ -58,7 +58,7 @@ public class TMDBReader {
         }
         for (Crew crewLink : rec.getCrewList()) {
           if (cred.getId().equals(crewLink.getId()) == false) {
-            Double crewweight = (double) (50);
+            Double crewweight = (double) (15);
             Connection crewcon =
                 new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
                     crewweight, rec.getMovieId(), rec.getTitle());
@@ -80,7 +80,7 @@ public class TMDBReader {
         }
         for (Credit credLink : rec.getCastList()) {
           if (crew.getId().equals(credLink.getId()) == false) {
-            Double weight = (double) (50);
+            Double weight = (double) (15);
             Connection con =
                 new Connection(agent, new AgentNode(credLink.getId(), credLink.getName()), weight,
                     rec.getMovieId(), rec.getTitle());
@@ -91,6 +91,28 @@ public class TMDBReader {
     }
   }
 
+  public static ArrayList<Connection> scrubEdges(ArrayList<Connection> edges, Boolean isIn) {
+    HashMap<Integer, Connection> smallestEdges = new HashMap<Integer, Connection>();
+
+    if (edges == null) {
+      return new ArrayList<Connection>();
+    }
+
+    for (Connection edge : edges) {
+      Integer matchKey =
+          isIn ? edge.getSourceNode().getIdentifier() : edge.getTargetNode().getIdentifier();
+      if (smallestEdges.containsKey(matchKey)) {
+        if (smallestEdges.get(matchKey).getWeight() > edge.getWeight()) {
+          smallestEdges.put(matchKey, edge);
+        }
+      } else {
+        smallestEdges.put(matchKey, edge);
+      }
+    }
+
+    return new ArrayList<Connection>(smallestEdges.values());
+  }
+
   public static void applyEdges() {
     int i = 0;
     System.out.println("processing apply edges...");
@@ -99,8 +121,8 @@ public class TMDBReader {
       if (i % 10000 == 0) {
         System.out.println("processing: " + i + "...");
       }
-      node.setIncomingEdges(inconnections.get(node.getIdentifier()));
-      node.setOutgoingEdges(outconnections.get(node.getIdentifier()));
+      node.setIncomingEdges(scrubEdges(inconnections.get(node.getIdentifier()), true));
+      node.setOutgoingEdges(scrubEdges(outconnections.get(node.getIdentifier()), false));
     }
   }
 

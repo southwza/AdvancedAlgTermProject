@@ -31,9 +31,11 @@ public class DijkstraTMDB {
 
     while (!minHeap.isEmpty()) {
       AgentNode fixedNode = minHeap.poll();
+      System.out.println(fixedNode + " " + fixedNode.getWeight());
       fixedNodes.add(fixedNode);
       if (fixedNodes.contains(target)) {
         // We can stop once the target node is fixed
+        System.out.println("STOP HERE, found the target");
         break;
       }
 
@@ -60,7 +62,7 @@ public class DijkstraTMDB {
 
       }
     }
-
+    System.out.println(target + " " + target.getWeight());
     return target.getWeight();
   }
 }
