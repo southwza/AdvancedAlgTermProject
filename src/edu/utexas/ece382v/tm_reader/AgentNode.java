@@ -11,6 +11,8 @@ public class AgentNode implements Comparable<AgentNode> {
   private List<Connection> incomingEdges = new ArrayList<>();
   private List<Connection> outgoingEdges = new ArrayList<>();
 
+  private AgentNode predecessor = null;
+
 
   public AgentNode(Integer identifier, String name) {
     this.identifier = identifier;
@@ -34,7 +36,7 @@ public class AgentNode implements Comparable<AgentNode> {
   }
 
   public Double getWeight() {
-    return this.weight;
+    return weight;
   }
 
   public void setWeight(Double weight) {
@@ -53,10 +55,10 @@ public class AgentNode implements Comparable<AgentNode> {
     this.outgoingEdges = outgoingEdges;
   }
 
-  @Override
-  public int compareTo(AgentNode o) {
-    return this.getIdentifier().compareTo(o.getIdentifier());
-  }
+  // @Override
+  // public int compareTo(AgentNode o) {
+  // return this.getIdentifier().compareTo(o.getIdentifier());
+  // }
 
   public List<Connection> getOutgoingEdges() {
     return this.outgoingEdges;
@@ -83,4 +85,17 @@ public class AgentNode implements Comparable<AgentNode> {
     return this.getIdentifier();
   }
 
+  public AgentNode getPredecessor() {
+    return predecessor;
+  }
+
+  public void setPredecessor(AgentNode predecessor) {
+    this.predecessor = predecessor;
+  }
+
+  @Override
+  public int compareTo(AgentNode o) {
+    // Not null safe
+    return weight.compareTo(o.getWeight());
+  }
 }

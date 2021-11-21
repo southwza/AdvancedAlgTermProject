@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 public class TMDBReader {
-  private static HashSet<AgentNode> nodes = new HashSet<AgentNode>();
+  // private static HashSet<AgentNode> nodes = new HashSet<AgentNode>();
+  private static HashMap<Integer, AgentNode> nodes = new HashMap<Integer, AgentNode>();
   private static HashMap<Integer, ArrayList<Connection>> inconnections =
       new HashMap<Integer, ArrayList<Connection>>();
   private static HashMap<Integer, ArrayList<Connection>> outconnections =
@@ -45,44 +47,54 @@ public class TMDBReader {
     for (TMDBRecord rec : records) {
       for (Credit cred : rec.getCastList()) {
         AgentNode agent = new AgentNode(cred.getId(), cred.getName());
-        nodes.add(agent);
+        nodes.putIfAbsent(agent.getIdentifier(), agent);
+        agent = nodes.get(agent.getIdentifier());
         for (Credit credLink : rec.getCastList()) {
           if (cred.equals(credLink) == false) {
             Double weight = Math.abs((double) (cred.getOrder() - credLink.getOrder()));
+            AgentNode credAgent = new AgentNode(credLink.getId(), credLink.getName());
+            nodes.putIfAbsent(credAgent.getIdentifier(), credAgent);
+            credAgent = nodes.get(credAgent.getIdentifier());
             Connection con =
-                new Connection(agent, new AgentNode(credLink.getId(), credLink.getName()), weight,
-                    rec.getMovieId(), rec.getTitle());
+                new Connection(agent, credAgent, weight, rec.getMovieId(), rec.getTitle());
             insertConnection(con);
           }
         }
         for (Crew crewLink : rec.getCrewList()) {
           if (cred.getId().equals(crewLink.getId()) == false) {
-            Double crewweight = (double) (50);
+            Double crewweight = (double) (30);
+            AgentNode crewAgent = new AgentNode(crewLink.getId(), crewLink.getName());
+            nodes.putIfAbsent(crewAgent.getIdentifier(), crewAgent);
+            crewAgent = nodes.get(crewAgent.getIdentifier());
             Connection crewcon =
-                new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
-                    crewweight, rec.getMovieId(), rec.getTitle());
+                new Connection(agent, crewAgent, crewweight, rec.getMovieId(), rec.getTitle());
             insertConnection(crewcon);
           }
         }
       }
       for (Crew crew : rec.getCrewList()) {
         AgentNode agent = new AgentNode(crew.getId(), crew.getName());
-        nodes.add(agent);
+        nodes.putIfAbsent(agent.getIdentifier(), agent);
+        agent = nodes.get(agent.getIdentifier());
         for (Crew crewLink : rec.getCrewList()) {
           if (crew.equals(crewLink) == false) {
             Double crewweight = (double) (5);
+            AgentNode crewAgent = new AgentNode(crewLink.getId(), crewLink.getName());
+            nodes.putIfAbsent(crewAgent.getIdentifier(), crewAgent);
+            crewAgent = nodes.get(crewAgent.getIdentifier());
             Connection crewcon =
-                new Connection(agent, new AgentNode(crewLink.getId(), crewLink.getName()),
-                    crewweight, rec.getMovieId(), rec.getTitle());
+                new Connection(agent, crewAgent, crewweight, rec.getMovieId(), rec.getTitle());
             insertConnection(crewcon);
           }
         }
         for (Credit credLink : rec.getCastList()) {
           if (crew.getId().equals(credLink.getId()) == false) {
-            Double weight = (double) (50);
+            Double weight = (double) (30);
+            AgentNode credAgent = new AgentNode(credLink.getId(), credLink.getName());
+            nodes.putIfAbsent(credAgent.getIdentifier(), credAgent);
+            credAgent = nodes.get(credAgent.getIdentifier());
             Connection con =
-                new Connection(agent, new AgentNode(credLink.getId(), credLink.getName()), weight,
-                    rec.getMovieId(), rec.getTitle());
+                new Connection(agent, credAgent, weight, rec.getMovieId(), rec.getTitle());
             insertConnection(con);
           }
         }
@@ -90,16 +102,38 @@ public class TMDBReader {
     }
   }
 
+  public static ArrayList<Connection> scrubEdges(ArrayList<Connection> edges, Boolean isIn) {
+    HashMap<Integer, Connection> smallestEdges = new HashMap<Integer, Connection>();
+
+    if (edges == null) {
+      return new ArrayList<Connection>();
+    }
+
+    for (Connection edge : edges) {
+      Integer matchKey =
+          isIn ? edge.getSourceNode().getIdentifier() : edge.getTargetNode().getIdentifier();
+      if (smallestEdges.containsKey(matchKey)) {
+        if (smallestEdges.get(matchKey).getWeight() > edge.getWeight()) {
+          smallestEdges.put(matchKey, edge);
+        }
+      } else {
+        smallestEdges.put(matchKey, edge);
+      }
+    }
+
+    return new ArrayList<Connection>(smallestEdges.values());
+  }
+
   public static void applyEdges() {
     int i = 0;
     System.out.println("processing apply edges...");
-    for (AgentNode node : nodes) {
+    for (AgentNode node : nodes.values()) {
       i = i + 1;
       if (i % 10000 == 0) {
         System.out.println("processing: " + i + "...");
       }
-      node.setIncomingEdges(inconnections.get(node.getIdentifier()));
-      node.setOutgoingEdges(outconnections.get(node.getIdentifier()));
+      node.setIncomingEdges(scrubEdges(inconnections.get(node.getIdentifier()), true));
+      node.setOutgoingEdges(scrubEdges(outconnections.get(node.getIdentifier()), false));
     }
   }
 
@@ -120,8 +154,7 @@ public class TMDBReader {
     System.out.println("Edges: " + connections.size());
   }
 
-  public static void main(String[] args) throws IOException {
-
+  public static TMDBGraph generateGraph() throws IOException {
     File csvFile = new File("./data/tmdb_5000_credits.csv");
 
     CsvMapper csvMapper = new CsvMapper();
@@ -139,6 +172,16 @@ public class TMDBReader {
 
     buildGraph(records);
     applyEdges();
+    System.out.println("---- DONE ----");
+
+    ArrayList<AgentNode> nodeslist =
+        (ArrayList<AgentNode>) nodes.values().stream().collect(Collectors.toList());
+
+    TMDBGraph g = new TMDBGraph(nodeslist, connections);
+    return g;
+  }
+
+  public static void printStats() {
     computeGraphStats();
     computeStats("Rob Reiner");
     computeStats("Kevin Bacon");
@@ -146,6 +189,5 @@ public class TMDBReader {
     computeStats("Owen Wilson");
     computeStats("Aubrey Plaza");
     computeStats("Julie Andrews");
-    System.out.println("---- DONE ----");
   }
 }
