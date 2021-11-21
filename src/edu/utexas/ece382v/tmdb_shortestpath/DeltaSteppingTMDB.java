@@ -86,6 +86,7 @@ public class DeltaSteppingTMDB {
             .collect(Collectors.toMap(e -> e.getTargetNode(), e -> e, (edge1, edge2) -> {
               double edge1Relaxation = calculateRelaxation(edge1);
               double edge2Relaxation = calculateRelaxation(edge2);
+              System.out.println(edge1 + " " + edge2);
               return edge2Relaxation < edge1Relaxation ? edge2 : edge1;
             }));
         // Just a quick note about the stream expression above: we have the possibility
@@ -126,7 +127,6 @@ public class DeltaSteppingTMDB {
     if (printStats) {
       printStats();
     }
-
     return target.getWeight().equals(Double.MAX_VALUE) ? null : target.getWeight();
   }
 
@@ -154,7 +154,14 @@ public class DeltaSteppingTMDB {
   }
 
   private double calculateRelaxation(Connection edge) {
-    return edge.getSourceNode().getWeight() + edge.getWeight();
+    System.out.println("sourcenode weight " + edge.getSourceNode().getWeight() + " "
+        + edge.getSourceNode() + " ----- " + edge);
+    if (edge.getSourceNode().getWeight() != null) {
+      return edge.getSourceNode().getWeight() + edge.getWeight();
+    } else {
+      return 0;
+    }
+
   }
 
   private void relax(AgentNode node, double weight, AgentNode sourceNode) {

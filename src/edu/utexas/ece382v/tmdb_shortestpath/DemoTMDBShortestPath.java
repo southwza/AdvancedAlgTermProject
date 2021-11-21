@@ -12,8 +12,8 @@ public class DemoTMDBShortestPath {
     System.out.println("Time taken to import and generate graph from tmdb dataset: "
         + (end - start) / 1000000 + "ms" + System.lineSeparator());
 
-    String sourceNode = "Luke Wilson";
-    String targetNode = "Owen Wilson";
+    String sourceNode = "Aubrey Plaza";
+    String targetNode = "Heath Ledger";
 
     // start = System.nanoTime();
     // Double shortestPathDist =
@@ -25,7 +25,7 @@ public class DemoTMDBShortestPath {
 
     DeltaSteppingTMDB ds = new DeltaSteppingTMDB();
 
-    Double delta = 30D;
+    Double delta = 50D;
     start = System.nanoTime();
     Double deltaSteppingShortestPathDist =
         ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta);

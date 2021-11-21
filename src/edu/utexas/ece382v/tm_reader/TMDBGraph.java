@@ -56,7 +56,7 @@ public class TMDBGraph {
 
   public AgentNode findNode(String name) {
     AgentNode node = nodes.stream().filter(n -> n.getName().equals(name)).findFirst().orElse(null);
-
+    System.out.println(node);
     return node;
   }
 
