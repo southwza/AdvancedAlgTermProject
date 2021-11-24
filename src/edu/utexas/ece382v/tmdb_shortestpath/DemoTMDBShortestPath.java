@@ -25,7 +25,6 @@ public class DemoTMDBShortestPath {
   }
 
   public static void main(String[] args) throws Exception {
-    TMDBReader TMDBReader = new TMDBReader();
     long start = System.nanoTime();
     TMDBGraph g = TMDBReader.generateGraph();
     long end = System.nanoTime();
