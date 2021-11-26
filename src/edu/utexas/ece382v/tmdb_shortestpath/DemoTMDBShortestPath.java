@@ -25,7 +25,6 @@ public class DemoTMDBShortestPath {
   }
 
   public static void main(String[] args) throws Exception {
-    TMDBReader TMDBReader = new TMDBReader();
     long start = System.nanoTime();
     TMDBGraph g = TMDBReader.generateGraph();
     long end = System.nanoTime();
@@ -61,7 +60,7 @@ public class DemoTMDBShortestPath {
 
     DeltaSteppingTMDB ds = new DeltaSteppingTMDB();
 
-    Double delta = 20D;
+    Double delta = 1D;
     start = System.nanoTime();
     Double deltaSteppingShortestPathDist =
         ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta);
