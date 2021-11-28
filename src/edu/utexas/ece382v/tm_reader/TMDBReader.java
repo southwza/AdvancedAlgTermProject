@@ -12,7 +12,6 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 public class TMDBReader {
-  // private static HashSet<AgentNode> nodes = new HashSet<AgentNode>();
   private static HashMap<Integer, AgentNode> nodes = new HashMap<Integer, AgentNode>();
   private static HashMap<Integer, ArrayList<Connection>> inconnections =
       new HashMap<Integer, ArrayList<Connection>>();
