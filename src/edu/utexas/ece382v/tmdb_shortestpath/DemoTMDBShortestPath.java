@@ -32,8 +32,8 @@ public class DemoTMDBShortestPath {
         + (end - start) / 1000000 + "ms" + System.lineSeparator());
     System.out.println(g.getNodes().size() + " Nodes and " + g.getEdges().size() + " Edges");
 
-    String sourceNode = "Kevin Bacon";
-    String targetNode = "Terry Crews";
+    String sourceNode = "Shirley Temple";
+    String targetNode = "Kevin Bacon";
 
     System.out.println();
     System.out.println("-----------------------");
@@ -60,7 +60,7 @@ public class DemoTMDBShortestPath {
 
     DeltaSteppingTMDB ds = new DeltaSteppingTMDB();
 
-    Double delta = 1D;
+    Double delta = 5D;
     start = System.nanoTime();
     Double deltaSteppingShortestPathDist =
         ds.calculateShortestPath(g, g.findNode(sourceNode), g.findNode(targetNode), delta);

@@ -124,7 +124,6 @@ public class DeltaSteppingTMDB {
     }
     printStats();
     return target.getWeight().equals(Double.MAX_VALUE) ? null : target.getWeight();
-    // return target.getWeight();
   };
 
   private void relaxInParallel(Map<AgentNode, Connection> req) {
